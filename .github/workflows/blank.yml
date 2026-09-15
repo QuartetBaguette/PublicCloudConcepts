@@ -13,6 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets. DOCKER_USERNAME }}
+          password: ${{ secrets. DOCKER_PASSWORD }}
+          
+      - name: Build and push Docker image
+        run: |
+          docker build -t hedys/pcc:latest .
+          docker push hedys/pcc:latest

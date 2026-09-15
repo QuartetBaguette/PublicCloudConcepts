@@ -25,7 +25,7 @@ jobs:
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login \
             --username "${{ secrets.DOCKER_USERNAME }}" \
-            --password-stdin
+            --password "${{ secrets.DOCKER_PASSWORD }}"
           
       - name: Build and push Docker image
         run: |

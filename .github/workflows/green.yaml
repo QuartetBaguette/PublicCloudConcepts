@@ -57,8 +57,7 @@ jobs:
         docker push "$GAR_ZONE-docker.pkg.dev/$PROJECT_ID/$GAR_REPO/$IMAGE:$IMAGE_TAG"
 
     # Deploy the Docker image to the GKE cluster
-    - name: Deploy
-      run: |-
-        cd /home/vandamruben
-        kubectl apply -f /home/vandamruben/blue-green-deploy.yaml
-        kubectl get pods
+    # - name: Deploy
+    #   run: |-
+    #     kubectl apply -f blue-green-deploy.yaml
+    #     kubectl get pods

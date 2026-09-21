@@ -1,6 +1,835 @@
-<HTML>
-    <BODY>
-        <p>Welkom in my website powered by Docker!</p>
-        <p> Container is updated using the pipeline!</p>
-    </BODY>
-</HTML>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Brightspace-stijl Dashboard – Saxion (demo)</title>
+<style>
+  :root{
+    --orange:#E8590C;
+    --orange-dark:#C24A08;
+    --orange-50:#FFF3EA;
+    --orange-100:#FFE2CC;
+    --blue:#2C6ECB;
+    --green:#1E9E6B;
+    --amber:#D97706;
+    --red:#DC2626;
+    --purple:#7C3AED;
+    --teal:#0D9488;
+    --ink:#1F2430;
+    --ink-2:#4B5565;
+    --ink-3:#8791A1;
+    --line:#E4E7EC;
+    --bg:#F3F4F6;
+    --card:#FFFFFF;
+    --shadow-sm:0 1px 2px rgba(16,24,40,.06);
+    --shadow-md:0 8px 24px rgba(16,24,40,.14);
+    --radius:12px;
+    --radius-sm:8px;
+  }
+  *,*::before,*::after{box-sizing:border-box;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .hidden{display:none !important;}
+  a{color:inherit;text-decoration:none;}
+  button{font:inherit;}
+  ul{list-style:none;margin:0;padding:0;}
+  h1,h2,h3,p{margin:0;}
+
+  /* ---------- Login ---------- */
+  .login-screen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    background:
+      radial-gradient(1100px 550px at 12% -10%, rgba(255,255,255,.20), transparent 60%),
+      linear-gradient(135deg,#F97316 0%,var(--orange) 45%,#A83608 100%);
+  }
+  .login-card{
+    width:100%;
+    max-width:380px;
+    background:var(--card);
+    border-radius:16px;
+    box-shadow:var(--shadow-md);
+    padding:36px 32px 28px;
+  }
+  .brand-lockup{display:flex;align-items:center;gap:12px;margin-bottom:26px;}
+  .logo-mark{
+    width:44px;height:44px;border-radius:12px;
+    background:linear-gradient(135deg,var(--orange),var(--orange-dark));
+    display:flex;align-items:center;justify-content:center;
+    color:#fff;font-weight:700;font-size:19px;
+    box-shadow:var(--shadow-sm);
+    flex-shrink:0;
+  }
+  .brand-name{font-size:19px;font-weight:700;color:var(--ink);line-height:1.2;}
+  .brand-sub{font-size:11.5px;color:var(--ink-3);letter-spacing:.02em;}
+  .login-title{font-size:15px;font-weight:600;margin:0 0 4px;}
+  .login-subtitle{font-size:13px;color:var(--ink-3);margin:0 0 22px;}
+  .field{margin-bottom:16px;}
+  .field label{display:block;font-size:12.5px;font-weight:600;color:var(--ink-2);margin-bottom:6px;}
+  .field input[type=text],.field input[type=password]{
+    width:100%;padding:10px 12px;border:1.5px solid var(--line);border-radius:8px;
+    font-size:14px;color:var(--ink);background:#fff;
+    transition:border-color .15s,box-shadow .15s;
+  }
+  .field input:focus{outline:none;border-color:var(--orange);box-shadow:0 0 0 3px var(--orange-100);}
+  .field-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;font-size:12.5px;color:var(--ink-2);}
+  .checkbox-row{display:flex;align-items:center;gap:6px;}
+  .link-muted{color:var(--blue);font-weight:600;}
+  .btn-primary{
+    width:100%;padding:11px;border:none;border-radius:8px;
+    background:var(--orange);color:#fff;font-size:14.5px;font-weight:600;
+    cursor:pointer;transition:background .15s,transform .05s;
+  }
+  .btn-primary:hover{background:var(--orange-dark);}
+  .btn-primary:active{transform:translateY(1px);}
+  .login-footnote{margin-top:22px;padding-top:16px;border-top:1px solid var(--line);font-size:11.5px;line-height:1.5;color:var(--ink-3);text-align:center;}
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    position:sticky;top:0;z-index:40;
+    background:#fff;border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:18px;
+    padding:0 18px;height:58px;
+  }
+  .topbar .brand-lockup{margin:0;flex-shrink:0;}
+  .topbar .logo-mark{width:34px;height:34px;font-size:15px;border-radius:9px;}
+  .topbar .brand-name{font-size:15.5px;}
+  .topbar .brand-sub{font-size:10.5px;}
+  .main-nav{
+    display:flex;align-items:center;gap:4px;
+    overflow-x:auto;flex:1 1 auto;
+    scrollbar-width:none;
+  }
+  .main-nav::-webkit-scrollbar{display:none;}
+  .nav-link{
+    position:relative;
+    padding:9px 12px;border-radius:8px;
+    font-size:13.5px;font-weight:600;color:var(--ink-2);
+    white-space:nowrap;
+    transition:background .15s,color .15s;
+  }
+  .nav-link:hover{background:var(--bg);color:var(--ink);}
+  .nav-link.active{color:var(--orange);}
+  .nav-link.active::after{
+    content:"";position:absolute;left:10px;right:10px;bottom:-9px;height:3px;
+    background:var(--orange);border-radius:2px 2px 0 0;
+  }
+  .topbar-actions{display:flex;align-items:center;gap:6px;flex-shrink:0;}
+  .search-box{
+    position:relative;display:flex;align-items:center;
+    background:var(--bg);border-radius:8px;padding:0 10px;height:36px;
+    width:190px;
+  }
+  .search-box svg{color:var(--ink-3);flex-shrink:0;}
+  .search-box input{
+    border:none;background:transparent;outline:none;
+    font-size:13px;color:var(--ink);width:100%;padding:0 0 0 8px;
+  }
+  .icon-btn{
+    position:relative;
+    width:36px;height:36px;border:none;background:transparent;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;color:var(--ink-2);
+    cursor:pointer;transition:background .15s,color .15s;
+  }
+  .icon-btn:hover{background:var(--bg);color:var(--ink);}
+  .badge{
+    position:absolute;top:4px;right:4px;
+    min-width:15px;height:15px;padding:0 3px;border-radius:8px;
+    background:var(--red);color:#fff;font-size:9.5px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid #fff;
+  }
+  .avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,var(--orange),var(--orange-dark));
+    color:#fff;font-size:12.5px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    border:none;cursor:pointer;flex-shrink:0;
+  }
+  .dropdown{position:relative;}
+  .dropdown-menu{
+    position:absolute;top:calc(100% + 10px);right:0;
+    width:280px;background:#fff;border-radius:12px;
+    box-shadow:var(--shadow-md);border:1px solid var(--line);
+    padding:8px;opacity:0;visibility:hidden;transform:translateY(-6px);
+    transition:opacity .15s,transform .15s,visibility .15s;
+    z-index:50;
+  }
+  .dropdown.open .dropdown-menu{opacity:1;visibility:visible;transform:translateY(0);}
+  .dropdown-menu.menu-narrow{width:220px;}
+  .dropdown-header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:8px 10px 10px;font-size:13px;font-weight:700;
+  }
+  .dropdown-header span.count{font-weight:600;color:var(--ink-3);font-size:11.5px;}
+  .menu-item{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 10px;border-radius:8px;font-size:13px;font-weight:600;color:var(--ink-2);
+    cursor:pointer;transition:background .15s;
+  }
+  .menu-item:hover{background:var(--bg);}
+  .menu-item svg{color:var(--ink-3);flex-shrink:0;}
+  .menu-divider{height:1px;background:var(--line);margin:6px 4px;}
+  .notif-item{padding:10px;border-radius:8px;cursor:pointer;transition:background .15s;}
+  .notif-item:hover{background:var(--bg);}
+  .notif-title{font-size:12.5px;font-weight:600;color:var(--ink);margin-bottom:2px;}
+  .notif-time{font-size:11px;color:var(--ink-3);}
+  .apps-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:6px;}
+  .app-item{
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    padding:12px 6px;border-radius:10px;cursor:pointer;
+    font-size:11px;font-weight:600;color:var(--ink-2);text-align:center;
+    transition:background .15s;
+  }
+  .app-item:hover{background:var(--bg);}
+  .app-item svg{color:var(--orange);}
+
+  /* ---------- Layout ---------- */
+  .welcome-banner{padding:26px 24px 4px;max-width:1240px;margin:0 auto;}
+  .welcome-banner h1{font-size:21px;font-weight:700;}
+  .welcome-banner p{font-size:13px;color:var(--ink-3);margin-top:4px;text-transform:capitalize;}
+  .layout{
+    max-width:1240px;margin:0 auto;padding:18px 24px 48px;
+    display:grid;grid-template-columns:1fr 320px;gap:22px;
+    align-items:start;
+  }
+  .section-title{font-size:15px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;}
+  .section-title .count-pill{
+    font-size:11.5px;font-weight:700;color:var(--ink-3);background:var(--bg);
+    padding:3px 9px;border-radius:20px;
+  }
+
+  /* ---------- Course cards ---------- */
+  .course-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;}
+  .course-card{
+    background:var(--card);border-radius:var(--radius);overflow:hidden;
+    box-shadow:var(--shadow-sm);border:1px solid var(--line);
+    transition:box-shadow .15s,transform .15s;cursor:pointer;
+  }
+  .course-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px);}
+  .course-banner{
+    position:relative;height:84px;display:flex;align-items:flex-end;padding:10px 14px;
+    color:#fff;
+  }
+  .course-banner .course-code{font-size:12px;font-weight:700;letter-spacing:.03em;opacity:.95;}
+  .banner-orange{background:linear-gradient(135deg,#FB923C,#C2410C);}
+  .banner-blue{background:linear-gradient(135deg,#60A5FA,#1D4ED8);}
+  .banner-green{background:linear-gradient(135deg,#34D399,#047857);}
+  .banner-purple{background:linear-gradient(135deg,#A78BFA,#5B21B6);}
+  .banner-red{background:linear-gradient(135deg,#F87171,#991B1B);}
+  .banner-teal{background:linear-gradient(135deg,#2DD4BF,#0F766E);}
+  .course-pin{
+    position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;
+    border:none;background:rgba(255,255,255,.25);backdrop-filter:blur(2px);
+    color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;
+    transition:background .15s;
+  }
+  .course-pin:hover{background:rgba(255,255,255,.4);}
+  .course-pin.pinned{background:#fff;color:var(--orange);}
+  .course-body{padding:13px 14px 14px;}
+  .course-title{font-size:13.5px;font-weight:700;margin-bottom:4px;line-height:1.3;}
+  .course-instructor{font-size:11.5px;color:var(--ink-3);margin-bottom:10px;}
+  .progress-row{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+  .progress-bar{flex:1;height:6px;border-radius:4px;background:var(--bg);overflow:hidden;}
+  .progress-fill{height:100%;border-radius:4px;background:var(--orange);}
+  .progress-pct{font-size:11px;font-weight:700;color:var(--ink-2);}
+  .course-actions{display:flex;gap:6px;border-top:1px solid var(--line);padding-top:10px;}
+  .course-actions button{
+    flex:1;border:none;background:transparent;color:var(--ink-3);
+    font-size:11px;font-weight:600;padding:6px 4px;border-radius:6px;
+    display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;
+    transition:background .15s,color .15s;
+  }
+  .course-actions button:hover{background:var(--bg);color:var(--orange);}
+
+  /* ---------- Sidebar widgets ---------- */
+  .widget{
+    background:var(--card);border-radius:var(--radius);border:1px solid var(--line);
+    box-shadow:var(--shadow-sm);padding:16px;margin-bottom:18px;
+  }
+  .widget-title{
+    display:flex;align-items:center;gap:8px;font-size:13.5px;font-weight:700;
+    margin-bottom:14px;color:var(--ink);
+  }
+  .widget-title svg{color:var(--orange);}
+  .task-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;}
+  .task-item + .task-item{border-top:1px solid var(--line);}
+  .task-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .dot-red{background:var(--red);}
+  .dot-amber{background:var(--amber);}
+  .dot-blue{background:var(--blue);}
+  .dot-gray{background:var(--ink-3);}
+  .task-course{font-size:10.5px;font-weight:700;color:var(--ink-3);text-transform:uppercase;letter-spacing:.03em;}
+  .task-name{font-size:12.5px;font-weight:600;margin:2px 0;}
+  .task-due{font-size:11.5px;color:var(--ink-3);}
+
+  .cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .cal-month{font-size:13px;font-weight:700;text-transform:capitalize;}
+  .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center;}
+  .cal-weekday{font-size:10px;font-weight:700;color:var(--ink-3);padding-bottom:4px;}
+  .cal-cell{
+    position:relative;font-size:11.5px;padding:6px 0;border-radius:6px;color:var(--ink-2);
+  }
+  .cal-empty{visibility:hidden;}
+  .cal-today{background:var(--orange);color:#fff;font-weight:700;}
+  .cal-dot{
+    position:absolute;bottom:2px;left:50%;transform:translateX(-50%);
+    width:4px;height:4px;border-radius:50%;background:var(--blue);
+  }
+  .cal-today .cal-dot{background:#fff;}
+
+  .announcement-item{padding:9px 0;}
+  .announcement-item + .announcement-item{border-top:1px solid var(--line);}
+  .ann-course{font-size:10.5px;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:.03em;}
+  .ann-title{font-size:12.5px;font-weight:600;margin:3px 0;line-height:1.35;}
+  .ann-time{font-size:11px;color:var(--ink-3);}
+
+  footer.app-footer{
+    text-align:center;font-size:11.5px;line-height:1.6;color:var(--ink-3);
+    padding:20px 24px 32px;max-width:640px;margin:0 auto;
+  }
+
+  /* ---------- Toast ---------- */
+  #toast{
+    position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);
+    background:var(--ink);color:#fff;font-size:13px;font-weight:600;
+    padding:11px 18px;border-radius:9px;box-shadow:var(--shadow-md);
+    opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;z-index:100;
+    max-width:90vw;text-align:center;
+  }
+  #toast.show{opacity:1;transform:translate(-50%,0);}
+
+  /* ---------- Responsive ---------- */
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    .search-box{display:none;}
+  }
+  @media (max-width:560px){
+    .topbar{padding:0 12px;gap:10px;}
+    .topbar .brand-sub{display:none;}
+    .welcome-banner,.layout{padding-left:14px;padding-right:14px;}
+    .course-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));}
+  }
+</style>
+</head>
+<body>
+
+  <!-- ===================== LOGIN VIEW ===================== -->
+  <div id="loginView" class="login-screen">
+    <div class="login-card">
+      <div class="brand-lockup">
+        <div class="logo-mark">S</div>
+        <div>
+          <div class="brand-name">Saxion</div>
+          <div class="brand-sub">brightspace-stijl omgeving</div>
+        </div>
+      </div>
+      <p class="login-title">Inloggen</p>
+      <p class="login-subtitle">Fictieve demo-omgeving — vul willekeurige gegevens in.</p>
+      <form id="loginForm">
+        <div class="field">
+          <label for="username">Gebruikersnaam</label>
+          <input type="text" id="username" placeholder="bv. student123" autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="password">Wachtwoord</label>
+          <input type="password" id="password" placeholder="••••••••" autocomplete="off">
+        </div>
+        <div class="field-row">
+          <label class="checkbox-row"><input type="checkbox"> Onthoud mij</label>
+          <a href="#" class="link-muted" id="forgotLink">Wachtwoord vergeten?</a>
+        </div>
+        <button type="submit" class="btn-primary">Inloggen</button>
+      </form>
+      <p class="login-footnote">
+        Dit is een fictieve demo-interface geïnspireerd op D2L Brightspace, gemaakt als portfolio-oefening.
+        Geen echte koppeling met Saxion of D2L — er wordt niets opgeslagen of verzonden.
+      </p>
+    </div>
+  </div>
+
+  <!-- ===================== DASHBOARD VIEW ===================== -->
+  <div id="dashboardView" class="hidden">
+
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="logo-mark">S</div>
+        <div>
+          <div class="brand-name">Saxion</div>
+          <div class="brand-sub">brightspace-stijl · demo</div>
+        </div>
+      </div>
+
+      <nav class="main-nav">
+        <a href="#" class="nav-link active">Cursushome</a>
+        <a href="#" class="nav-link" data-toast="Inhoud">Inhoud</a>
+        <a href="#" class="nav-link" data-toast="Cijfers">Cijfers</a>
+        <a href="#" class="nav-link" data-toast="Kalender">Kalender</a>
+        <a href="#" class="nav-link" data-toast="Discussies">Discussies</a>
+      </nav>
+
+      <div class="topbar-actions">
+        <div class="search-box">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="6"/><line x1="14.5" y1="14.5" x2="20" y2="20"/></svg>
+          <input type="text" id="courseSearch" placeholder="Zoek cursussen…">
+        </div>
+
+        <div class="dropdown" id="appsDropdown">
+          <button class="icon-btn" data-dropdown-toggle aria-label="Applicaties">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="5" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="19" cy="5" r="2"/><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="19" r="2"/><circle cx="12" cy="19" r="2"/><circle cx="19" cy="19" r="2"/></svg>
+          </button>
+          <div class="dropdown-menu">
+            <div class="apps-grid">
+              <div class="app-item" data-toast="Cursussen">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6 L4 4 V18 L12 20 L20 18 V4 L12 6 Z"/><line x1="12" y1="6" x2="12" y2="20"/></svg>
+                Cursussen
+              </div>
+              <div class="app-item" data-toast="Cijfers">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="20" x2="6" y2="14"/><line x1="12" y1="20" x2="12" y2="8"/><line x1="18" y1="20" x2="18" y2="4"/></svg>
+                Cijfers
+              </div>
+              <div class="app-item" data-toast="Kalender">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+                Kalender
+              </div>
+              <div class="app-item" data-toast="Discussies">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Discussies
+              </div>
+              <div class="app-item" data-toast="Inhoud">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6z"/></svg>
+                Inhoud
+              </div>
+              <div class="app-item" data-toast="E-mail">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><polyline points="3 7 12 13 21 7"/></svg>
+                E-mail
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="dropdown" id="notifDropdown">
+          <button class="icon-btn" data-dropdown-toggle aria-label="Meldingen">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+            <span class="badge">3</span>
+          </button>
+          <div class="dropdown-menu">
+            <div class="dropdown-header">Meldingen <span class="count">3 nieuw</span></div>
+            <div class="notif-item" data-toast="Melding">
+              <div class="notif-title">Nieuw cijfer beschikbaar — Databases &amp; SQL</div>
+              <div class="notif-time">1 uur geleden</div>
+            </div>
+            <div class="notif-item" data-toast="Melding">
+              <div class="notif-title">Herinnering: opdracht morgen inleveren</div>
+              <div class="notif-time">3 uur geleden</div>
+            </div>
+            <div class="notif-item" data-toast="Melding">
+              <div class="notif-title">Rooster gewijzigd voor Cybersecurity Fundamentals</div>
+              <div class="notif-time">Gisteren</div>
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" data-toast="Alle meldingen">Bekijk alle meldingen</div>
+          </div>
+        </div>
+
+        <div class="dropdown" id="userDropdown">
+          <button class="avatar" data-dropdown-toggle aria-label="Gebruikersmenu" id="avatarInitials">S</button>
+          <div class="dropdown-menu menu-narrow">
+            <div class="dropdown-header" id="userMenuName">Student</div>
+            <div class="menu-item" data-toast="Profiel">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+              Profiel
+            </div>
+            <div class="menu-item" data-toast="Instellingen">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+              Instellingen
+            </div>
+            <div class="menu-divider"></div>
+            <div class="menu-item" id="logoutBtn">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+              Uitloggen
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="welcome-banner">
+      <h1>Welkom terug, <span id="welcomeName">Student</span></h1>
+      <p id="todayLabel"></p>
+    </div>
+
+    <div class="layout">
+      <main>
+        <div class="section-title">Mijn cursussen <span class="count-pill" id="courseCount">6</span></div>
+        <div class="course-grid" id="courseGrid">
+
+          <article class="course-card" data-title="cloud infrastructure ci301">
+            <div class="course-banner banner-orange">
+              <button class="course-pin" data-toast-stop aria-label="Vastzetten">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>
+              </button>
+              <span class="course-code">CI301</span>
+            </div>
+            <div class="course-body">
+              <div class="course-title">Cloud &amp; Infrastructure</div>
+              <div class="course-instructor">Docent: R. van Dijk</div>
+              <div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:72%"></div></div><span class="progress-pct">72%</span></div>
+              <div class="course-actions">
+                <button data-toast="Inhoud – CI301">Inhoud</button>
+                <button data-toast="Cijfers – CI301">Cijfers</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="course-card" data-title="software engineering 2 se202">
+            <div class="course-banner banner-blue">
+              <button class="course-pin" data-toast-stop aria-label="Vastzetten">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>
+              </button>
+              <span class="course-code">SE202</span>
+            </div>
+            <div class="course-body">
+              <div class="course-title">Software Engineering 2</div>
+              <div class="course-instructor">Docent: M. Jansen</div>
+              <div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:45%"></div></div><span class="progress-pct">45%</span></div>
+              <div class="course-actions">
+                <button data-toast="Inhoud – SE202">Inhoud</button>
+                <button data-toast="Cijfers – SE202">Cijfers</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="course-card" data-title="databases sql db101">
+            <div class="course-banner banner-green">
+              <button class="course-pin" data-toast-stop aria-label="Vastzetten">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>
+              </button>
+              <span class="course-code">DB101</span>
+            </div>
+            <div class="course-body">
+              <div class="course-title">Databases &amp; SQL</div>
+              <div class="course-instructor">Docent: A. Bakker</div>
+              <div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:88%"></div></div><span class="progress-pct">88%</span></div>
+              <div class="course-actions">
+                <button data-toast="Inhoud – DB101">Inhoud</button>
+                <button data-toast="Cijfers – DB101">Cijfers</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="course-card" data-title="project agile teamwork prj220">
+            <div class="course-banner banner-purple">
+              <button class="course-pin" data-toast-stop aria-label="Vastzetten">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>
+              </button>
+              <span class="course-code">PRJ220</span>
+            </div>
+            <div class="course-body">
+              <div class="course-title">Project: Agile Teamwork</div>
+              <div class="course-instructor">Docent: S. de Groot</div>
+              <div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div><span class="progress-pct">60%</span></div>
+              <div class="course-actions">
+                <button data-toast="Inhoud – PRJ220">Inhoud</button>
+                <button data-toast="Cijfers – PRJ220">Cijfers</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="course-card" data-title="cybersecurity fundamentals sec110">
+            <div class="course-banner banner-red">
+              <button class="course-pin" data-toast-stop aria-label="Vastzetten">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>
+              </button>
+              <span class="course-code">SEC110</span>
+            </div>
+            <div class="course-body">
+              <div class="course-title">Cybersecurity Fundamentals</div>
+              <div class="course-instructor">Docent: T. Willems</div>
+              <div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:30%"></div></div><span class="progress-pct">30%</span></div>
+              <div class="course-actions">
+                <button data-toast="Inhoud – SEC110">Inhoud</button>
+                <button data-toast="Cijfers – SEC110">Cijfers</button>
+              </div>
+            </div>
+          </article>
+
+          <article class="course-card" data-title="web development web150">
+            <div class="course-banner banner-teal">
+              <button class="course-pin" data-toast-stop aria-label="Vastzetten">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 3h12v18l-6-4-6 4V3z"/></svg>
+              </button>
+              <span class="course-code">WEB150</span>
+            </div>
+            <div class="course-body">
+              <div class="course-title">Web Development</div>
+              <div class="course-instructor">Docent: L. Visser</div>
+              <div class="progress-row"><div class="progress-bar"><div class="progress-fill" style="width:95%"></div></div><span class="progress-pct">95%</span></div>
+              <div class="course-actions">
+                <button data-toast="Inhoud – WEB150">Inhoud</button>
+                <button data-toast="Cijfers – WEB150">Cijfers</button>
+              </div>
+            </div>
+          </article>
+
+        </div>
+        <p id="noResults" class="hidden" style="text-align:center;color:var(--ink-3);font-size:13px;padding:30px 0;">Geen cursussen gevonden.</p>
+      </main>
+
+      <aside>
+        <div class="widget">
+          <div class="widget-title">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><polyline points="8 12 11 15 16 9"/></svg>
+            Aankomende taken
+          </div>
+          <div class="task-item">
+            <span class="task-dot dot-red"></span>
+            <div>
+              <div class="task-course">Cloud &amp; Infrastructure</div>
+              <div class="task-name">Inleveren: Terraform opdracht 2</div>
+              <div class="task-due">Vandaag, 23:59</div>
+            </div>
+          </div>
+          <div class="task-item">
+            <span class="task-dot dot-amber"></span>
+            <div>
+              <div class="task-course">Software Engineering 2</div>
+              <div class="task-name">Quiz: Design Patterns</div>
+              <div class="task-due">Morgen, 09:00</div>
+            </div>
+          </div>
+          <div class="task-item">
+            <span class="task-dot dot-blue"></span>
+            <div>
+              <div class="task-course">Databases &amp; SQL</div>
+              <div class="task-name">Peer review inleveren</div>
+              <div class="task-due">Vrijdag, 17:00</div>
+            </div>
+          </div>
+          <div class="task-item">
+            <span class="task-dot dot-gray"></span>
+            <div>
+              <div class="task-course">Project: Agile Teamwork</div>
+              <div class="task-name">Sprint retrospective voorbereiden</div>
+              <div class="task-due">Volgende week</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="widget">
+          <div class="cal-header">
+            <div class="widget-title" style="margin-bottom:0;">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="16" y1="2" x2="16" y2="6"/></svg>
+              Kalender
+            </div>
+            <span class="cal-month" id="calMonthLabel"></span>
+          </div>
+          <div class="cal-grid" id="calGrid"></div>
+        </div>
+
+        <div class="widget">
+          <div class="widget-title">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Mededelingen
+          </div>
+          <div class="announcement-item" data-toast="Mededeling">
+            <div class="ann-course">Cloud &amp; Infrastructure</div>
+            <div class="ann-title">Practicumzaal gewijzigd naar H1.12</div>
+            <div class="ann-time">2 uur geleden</div>
+          </div>
+          <div class="announcement-item" data-toast="Mededeling">
+            <div class="ann-course">Saxion Servicedesk</div>
+            <div class="ann-title">Gepland onderhoud demo-omgeving: zo 02:00–04:00</div>
+            <div class="ann-time">1 dag geleden</div>
+          </div>
+          <div class="announcement-item" data-toast="Mededeling">
+            <div class="ann-course">Software Engineering 2</div>
+            <div class="ann-title">Nieuwe sheets week 4 geplaatst onder Inhoud</div>
+            <div class="ann-time">2 dagen geleden</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer class="app-footer">
+      Dit is een fictieve, statische demo-interface geïnspireerd op D2L Brightspace — gemaakt als portfolio-/oefenproject.
+      Niet verbonden met, onderschreven door, of representatief voor Saxion of D2L. Alle namen en gegevens zijn verzonnen.
+    </footer>
+  </div>
+
+  <div id="toast"></div>
+
+<script>
+(function(){
+  var loginView = document.getElementById('loginView');
+  var dashboardView = document.getElementById('dashboardView');
+  var loginForm = document.getElementById('loginForm');
+  var welcomeName = document.getElementById('welcomeName');
+  var userMenuName = document.getElementById('userMenuName');
+  var avatarInitials = document.getElementById('avatarInitials');
+  var toast = document.getElementById('toast');
+  var toastTimer = null;
+
+  function showToast(msg){
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function(){ toast.classList.remove('show'); }, 2200);
+  }
+
+  function initialsFrom(name){
+    var parts = name.split(/\s+/).filter(Boolean);
+    var first = parts[0] ? parts[0][0] : 'S';
+    var second = parts[1] ? parts[1][0] : '';
+    return (first + second).toUpperCase();
+  }
+
+  function formatDisplayName(raw){
+    raw = raw.trim();
+    if(!raw) return 'Student';
+    return raw.charAt(0).toUpperCase() + raw.slice(1);
+  }
+
+  var weekdayNames = ['ma','di','wo','do','vr','za','zo'];
+  var monthNames = ['januari','februari','maart','april','mei','juni','juli','augustus','september','oktober','november','december'];
+
+  function renderCalendar(){
+    var calGrid = document.getElementById('calGrid');
+    var calMonthLabel = document.getElementById('calMonthLabel');
+    var now = new Date();
+    var year = now.getFullYear();
+    var month = now.getMonth();
+    var todayNum = now.getDate();
+
+    calMonthLabel.textContent = monthNames[month] + ' ' + year;
+
+    var firstDay = new Date(year, month, 1);
+    var startIndex = (firstDay.getDay() + 6) % 7; // maandag = 0
+    var daysInMonth = new Date(year, month + 1, 0).getDate();
+    var markedDays = [todayNum + 2, todayNum + 5, todayNum + 9].filter(function(d){
+      return d >= 1 && d <= daysInMonth;
+    });
+
+    calGrid.innerHTML = '';
+    weekdayNames.forEach(function(w){
+      var el = document.createElement('div');
+      el.className = 'cal-weekday';
+      el.textContent = w;
+      calGrid.appendChild(el);
+    });
+    for(var i = 0; i < startIndex; i++){
+      var empty = document.createElement('div');
+      empty.className = 'cal-cell cal-empty';
+      calGrid.appendChild(empty);
+    }
+    for(var d = 1; d <= daysInMonth; d++){
+      var cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      if(d === todayNum) cell.classList.add('cal-today');
+      cell.textContent = d;
+      if(markedDays.indexOf(d) !== -1){
+        var dot = document.createElement('span');
+        dot.className = 'cal-dot';
+        cell.appendChild(dot);
+      }
+      calGrid.appendChild(cell);
+    }
+  }
+
+  function renderToday(){
+    var now = new Date();
+    var days = ['zondag','maandag','dinsdag','woensdag','donderdag','vrijdag','zaterdag'];
+    var label = days[now.getDay()] + ' ' + now.getDate() + ' ' + monthNames[now.getMonth()] + ' ' + now.getFullYear();
+    document.getElementById('todayLabel').textContent = label;
+  }
+
+  loginForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    var usernameInput = document.getElementById('username');
+    var displayName = formatDisplayName(usernameInput.value);
+    welcomeName.textContent = displayName;
+    userMenuName.textContent = displayName;
+    avatarInitials.textContent = initialsFrom(displayName);
+    loginView.classList.add('hidden');
+    dashboardView.classList.remove('hidden');
+    renderCalendar();
+    renderToday();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', function(){
+    dashboardView.classList.add('hidden');
+    loginView.classList.remove('hidden');
+    loginForm.reset();
+    closeAllDropdowns();
+  });
+
+  document.getElementById('forgotLink').addEventListener('click', function(e){
+    e.preventDefault();
+    showToast('Demo-omgeving — er is geen echt wachtwoordherstel.');
+  });
+
+  // Dropdowns
+  function closeAllDropdowns(){
+    document.querySelectorAll('.dropdown.open').forEach(function(d){ d.classList.remove('open'); });
+  }
+  document.querySelectorAll('[data-dropdown-toggle]').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.stopPropagation();
+      var dropdown = this.closest('.dropdown');
+      var isOpen = dropdown.classList.contains('open');
+      closeAllDropdowns();
+      if(!isOpen) dropdown.classList.add('open');
+    });
+  });
+  document.addEventListener('click', closeAllDropdowns);
+
+  // Toast triggers (nav links, menu items, course actions, announcements...)
+  document.querySelectorAll('[data-toast]').forEach(function(el){
+    el.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      var label = this.getAttribute('data-toast');
+      showToast('"' + label + '" is niet beschikbaar in deze demo.');
+    });
+  });
+
+  // Course pin / favorite toggle (local UI state only)
+  document.querySelectorAll('.course-pin').forEach(function(btn){
+    btn.addEventListener('click', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      this.classList.toggle('pinned');
+    });
+  });
+
+  // Live course search/filter
+  var searchInput = document.getElementById('courseSearch');
+  var courseCards = Array.prototype.slice.call(document.querySelectorAll('.course-card'));
+  var noResults = document.getElementById('noResults');
+  var courseCount = document.getElementById('courseCount');
+  searchInput.addEventListener('input', function(){
+    var q = this.value.trim().toLowerCase();
+    var visible = 0;
+    courseCards.forEach(function(card){
+      var match = card.getAttribute('data-title').indexOf(q) !== -1;
+      card.classList.toggle('hidden', !match);
+      if(match) visible++;
+    });
+    courseCount.textContent = visible;
+    noResults.classList.toggle('hidden', visible !== 0);
+  });
+})();
+</script>
+</body>
+</html>

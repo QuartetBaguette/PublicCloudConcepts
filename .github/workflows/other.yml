@@ -1,0 +1,33 @@
+name: Docker Image CI
+
+on:
+  push:
+    branches: other
+  pull_request:
+    branches: other
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+      # - name: Login to Docker Hub
+      #   uses: docker/login-action@v4
+      #   with:
+      #     username: ${{ secrets.DOCKER_USERNAME }}
+      #     password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to Docker Hub
+        run: |
+          echo "${{ secrets.DOCKER_PASSWORD }}" | docker login \
+            --username "${{ secrets.DOCKER_USERNAME }}" \
+            --password "${{ secrets.DOCKER_PASSWORD }}"
+          
+      - name: Build and push Docker image
+        run: |
+          docker build -t hedys/pcc2:latest .
+          docker push hedys/pcc2:latest

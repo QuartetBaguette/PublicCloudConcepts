@@ -1,6 +1,584 @@
-<HTML>
-    <BODY>
-        <p>Welkom in my website powered by Docker!</p>
-        <p> Container is updated using the pipeline!</p>
-    </BODY>
-</HTML>
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bison — Cijferportaal (demo)</title>
+<style>
+  :root{
+    --primary:#00695c;
+    --primary-dark:#00473e;
+    --primary-light:#e0f2f0;
+    --accent:#d98c00;
+    --ok:#1b8a4c;
+    --ok-bg:#e5f6ec;
+    --bad:#c62828;
+    --bad-bg:#fdeaea;
+    --bg:#f4f6f7;
+    --card:#ffffff;
+    --text:#1c2b2a;
+    --muted:#5c716f;
+    --border:#e1e8e7;
+    --radius:10px;
+    --shadow:0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Roboto, Arial, sans-serif;
+    background:var(--bg);
+    color:var(--text);
+  }
+  .app{
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* Sidebar */
+  .sidebar{
+    width:230px;
+    flex-shrink:0;
+    background:var(--primary-dark);
+    color:#e7f3f1;
+    display:flex;
+    flex-direction:column;
+    padding:20px 0;
+  }
+  .logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-size:22px;
+    font-weight:700;
+    letter-spacing:.5px;
+    padding:0 20px 20px 20px;
+    border-bottom:1px solid rgba(255,255,255,.12);
+    margin-bottom:12px;
+  }
+  .logo span.mark{
+    font-size:26px;
+  }
+  nav{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    padding:0 10px;
+  }
+  .nav-item{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    background:none;
+    border:none;
+    color:#cfe4e1;
+    text-align:left;
+    font-size:14.5px;
+    padding:11px 14px;
+    border-radius:8px;
+    cursor:pointer;
+    font-family:inherit;
+  }
+  .nav-item:hover{
+    background:rgba(255,255,255,.08);
+    color:#fff;
+  }
+  .nav-item.active{
+    background:var(--primary);
+    color:#fff;
+    font-weight:600;
+  }
+  .nav-item .badge{
+    background:var(--accent);
+    color:#fff;
+    font-size:11px;
+    font-weight:700;
+    padding:2px 7px;
+    border-radius:999px;
+  }
+  .sidebar-footer{
+    margin-top:auto;
+    padding:14px 20px 0 20px;
+    font-size:12px;
+    color:#93b0ac;
+    border-top:1px solid rgba(255,255,255,.12);
+  }
+
+  /* Main */
+  .main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-width:0;
+  }
+  .topbar{
+    background:var(--card);
+    border-bottom:1px solid var(--border);
+    padding:16px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:sticky;
+    top:0;
+    z-index:5;
+  }
+  .topbar h1{
+    font-size:20px;
+    margin:0;
+  }
+  .user{
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  .user-info{
+    text-align:right;
+    line-height:1.3;
+  }
+  .user-info strong{
+    display:block;
+    font-size:14px;
+  }
+  .user-info span{
+    font-size:12px;
+    color:var(--muted);
+  }
+  .avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    background:var(--primary);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:700;
+    font-size:13px;
+  }
+
+  .demo-banner{
+    background:#fff6e0;
+    border-bottom:1px solid #f0d894;
+    color:#7a5b00;
+    font-size:13px;
+    padding:8px 28px;
+  }
+
+  .content{
+    padding:26px 28px 40px 28px;
+  }
+  .content.hidden{display:none;}
+
+  /* Cards */
+  .cards{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+    gap:16px;
+    margin-bottom:26px;
+  }
+  .card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px 20px;
+  }
+  .card .label{
+    font-size:12.5px;
+    color:var(--muted);
+    text-transform:uppercase;
+    letter-spacing:.4px;
+    margin-bottom:6px;
+  }
+  .card .value{
+    font-size:28px;
+    font-weight:700;
+    color:var(--primary-dark);
+  }
+  .card .sub{
+    font-size:12.5px;
+    color:var(--muted);
+    margin-top:4px;
+  }
+  .progress-track{
+    margin-top:10px;
+    height:8px;
+    border-radius:999px;
+    background:var(--primary-light);
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--primary);
+    border-radius:999px;
+  }
+
+  h2.section-title{
+    font-size:15px;
+    color:var(--primary-dark);
+    margin:0 0 12px 0;
+  }
+
+  /* Table */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    overflow:hidden;
+  }
+  thead th{
+    text-align:left;
+    background:var(--primary-light);
+    color:var(--primary-dark);
+    font-size:12.5px;
+    text-transform:uppercase;
+    letter-spacing:.3px;
+    padding:11px 16px;
+    border-bottom:1px solid var(--border);
+  }
+  tbody td{
+    padding:12px 16px;
+    font-size:14px;
+    border-bottom:1px solid var(--border);
+  }
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#fafcfc;}
+  .grade-cell{
+    font-weight:700;
+  }
+  .status{
+    display:inline-block;
+    padding:3px 10px;
+    border-radius:999px;
+    font-size:12px;
+    font-weight:600;
+  }
+  .status.voldoende{background:var(--ok-bg); color:var(--ok);}
+  .status.onvoldoende{background:var(--bad-bg); color:var(--bad);}
+
+  .periode-group{margin-bottom:22px;}
+  .periode-group h3{
+    font-size:13.5px;
+    color:var(--muted);
+    margin:0 0 8px 2px;
+    font-weight:600;
+  }
+
+  select#filterPeriode{
+    padding:8px 12px;
+    border-radius:8px;
+    border:1px solid var(--border);
+    background:var(--card);
+    font-size:13.5px;
+    margin-bottom:16px;
+    font-family:inherit;
+  }
+
+  /* Rooster */
+  .rooster-table th, .rooster-table td{text-align:center;}
+  .rooster-table td.slot{
+    background:var(--primary-light);
+    border-radius:6px;
+    font-size:12.5px;
+    color:var(--primary-dark);
+    line-height:1.4;
+    padding:8px 6px;
+  }
+  .rooster-table td.empty{color:#c3cfce; font-size:12px;}
+
+  /* Berichten */
+  .message{
+    display:flex;
+    gap:14px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px 18px;
+    margin-bottom:10px;
+  }
+  .message.unread{border-left:4px solid var(--primary);}
+  .message .dot{
+    width:9px;height:9px;border-radius:50%;
+    background:var(--primary);
+    margin-top:6px;
+    flex-shrink:0;
+  }
+  .message.read .dot{background:transparent;}
+  .message-body{flex:1;}
+  .message-title{font-weight:600; font-size:14.5px;}
+  .message-meta{font-size:12px; color:var(--muted); margin-top:2px;}
+  .message-text{font-size:13.5px; color:var(--text); margin-top:6px;}
+
+  /* Instellingen */
+  .settings-form{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:22px;
+    max-width:480px;
+  }
+  .field{margin-bottom:16px;}
+  .field label{
+    display:block;
+    font-size:13px;
+    color:var(--muted);
+    margin-bottom:6px;
+  }
+  .field input, .field select{
+    width:100%;
+    padding:9px 12px;
+    border:1px solid var(--border);
+    border-radius:8px;
+    font-size:14px;
+    font-family:inherit;
+    background:#fbfcfc;
+  }
+  .field input:disabled{color:var(--muted);}
+
+  @media (max-width: 760px){
+    .app{flex-direction:column;}
+    .sidebar{
+      width:100%;
+      flex-direction:row;
+      align-items:center;
+      padding:10px 14px;
+      overflow-x:auto;
+    }
+    .logo{border-bottom:none; padding:0 14px 0 0; margin-bottom:0;}
+    nav{flex-direction:row; padding:0;}
+    .sidebar-footer{display:none;}
+    .topbar{padding:14px 18px;}
+    .content{padding:18px;}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="logo"><span class="mark">🦬</span> Bison</div>
+    <nav id="nav">
+      <button class="nav-item active" data-tab="dashboard">Dashboard</button>
+      <button class="nav-item" data-tab="cijfers">Cijfers</button>
+      <button class="nav-item" data-tab="rooster">Rooster</button>
+      <button class="nav-item" data-tab="berichten">Berichten <span class="badge" id="msgBadge">2</span></button>
+      <button class="nav-item" data-tab="instellingen">Instellingen</button>
+    </nav>
+    <div class="sidebar-footer">Demo-omgeving · fictieve gegevens</div>
+  </aside>
+
+  <div class="main">
+    <div class="demo-banner">Dit is een demo-omgeving met fictieve gegevens, losstaand van enig echt studentinformatiesysteem.</div>
+    <header class="topbar">
+      <h1 id="pageTitle">Dashboard</h1>
+      <div class="user">
+        <div class="user-info">
+          <strong>Demo Student</strong>
+          <span>Studentnr. 000000 · HBO-ICT</span>
+        </div>
+        <div class="avatar">DS</div>
+      </div>
+    </header>
+
+    <!-- Dashboard -->
+    <section class="content" id="tab-dashboard">
+      <div class="cards">
+        <div class="card">
+          <div class="label">Gemiddeld cijfer</div>
+          <div class="value" id="statGemiddelde">-</div>
+          <div class="sub">Over alle behaalde vakken</div>
+        </div>
+        <div class="card">
+          <div class="label">ECTS behaald</div>
+          <div class="value" id="statEcts">-</div>
+          <div class="sub" id="statEctsSub"></div>
+          <div class="progress-track"><div class="progress-fill" id="ectsBar" style="width:0%"></div></div>
+        </div>
+        <div class="card">
+          <div class="label">Openstaand</div>
+          <div class="value" id="statOnvoldoende">-</div>
+          <div class="sub">Vakken nog niet behaald</div>
+        </div>
+      </div>
+
+      <h2 class="section-title">Meest recente cijfers</h2>
+      <table>
+        <thead>
+          <tr><th>Vak</th><th>Code</th><th>Periode</th><th>Cijfer</th><th>Status</th></tr>
+        </thead>
+        <tbody id="recentGrades"></tbody>
+      </table>
+    </section>
+
+    <!-- Cijfers -->
+    <section class="content hidden" id="tab-cijfers">
+      <select id="filterPeriode">
+        <option value="alle">Alle periodes</option>
+      </select>
+      <div id="cijfersPerPeriode"></div>
+    </section>
+
+    <!-- Rooster -->
+    <section class="content hidden" id="tab-rooster">
+      <h2 class="section-title">Week 39 — Rooster</h2>
+      <table class="rooster-table">
+        <thead>
+          <tr><th></th><th>Ma</th><th>Di</th><th>Wo</th><th>Do</th><th>Vr</th></tr>
+        </thead>
+        <tbody id="roosterBody"></tbody>
+      </table>
+    </section>
+
+    <!-- Berichten -->
+    <section class="content hidden" id="tab-berichten">
+      <div id="berichtenList"></div>
+    </section>
+
+    <!-- Instellingen -->
+    <section class="content hidden" id="tab-instellingen">
+      <div class="settings-form">
+        <div class="field">
+          <label>Naam</label>
+          <input type="text" value="Demo Student" disabled>
+        </div>
+        <div class="field">
+          <label>Studentnummer</label>
+          <input type="text" value="000000" disabled>
+        </div>
+        <div class="field">
+          <label>Opleiding</label>
+          <input type="text" value="HBO-ICT" disabled>
+        </div>
+        <div class="field">
+          <label>E-mailnotificaties</label>
+          <select disabled>
+            <option>Aan</option>
+            <option>Uit</option>
+          </select>
+        </div>
+        <div class="sub" style="color:var(--muted); font-size:12.5px;">Instellingen zijn niet-functioneel in deze demo.</div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+  const grades = [
+    { vak:"Cloud Concepts", code:"CLD201", periode:"Periode 1", ects:10, cijfer:8.5, datum:"2026-09-15" },
+    { vak:"Software Engineering", code:"SE101", periode:"Periode 1", ects:5, cijfer:7.5, datum:"2026-09-10" },
+    { vak:"Databases", code:"DB102", periode:"Periode 1", ects:5, cijfer:6.0, datum:"2026-09-08" },
+    { vak:"Netwerken", code:"NW103", periode:"Periode 1", ects:5, cijfer:5.0, datum:"2026-09-02" },
+    { vak:"Devops & Pipelines", code:"DOP205", periode:"Periode 2", ects:5, cijfer:8.0, datum:"2026-01-20" },
+    { vak:"Security Fundamentals", code:"SEC110", periode:"Periode 2", ects:5, cijfer:7.0, datum:"2026-01-14" },
+    { vak:"Projectmanagement", code:"PM104", periode:"Periode 2", ects:5, cijfer:7.5, datum:"2026-01-07" },
+  ];
+  const TOTAAL_ECTS = 240;
+
+  function isVoldoende(cijfer){ return cijfer >= 5.5; }
+
+  function renderDashboard(){
+    const behaald = grades.filter(g => isVoldoende(g.cijfer));
+    const gemiddelde = behaald.reduce((s,g) => s + g.cijfer, 0) / behaald.length;
+    const ectsBehaald = behaald.reduce((s,g) => s + g.ects, 0);
+    const onvoldoende = grades.filter(g => !isVoldoende(g.cijfer)).length;
+
+    document.getElementById("statGemiddelde").textContent = gemiddelde.toFixed(1);
+    document.getElementById("statEcts").textContent = ectsBehaald;
+    document.getElementById("statEctsSub").textContent = `van ${TOTAAL_ECTS} ECTS`;
+    document.getElementById("ectsBar").style.width = Math.min(100, (ectsBehaald/TOTAAL_ECTS)*100) + "%";
+    document.getElementById("statOnvoldoende").textContent = onvoldoende;
+
+    const recent = [...grades].sort((a,b) => new Date(b.datum) - new Date(a.datum)).slice(0,5);
+    document.getElementById("recentGrades").innerHTML = recent.map(rowHtml).join("");
+  }
+
+  function rowHtml(g){
+    const ok = isVoldoende(g.cijfer);
+    return `<tr>
+      <td>${g.vak}</td>
+      <td>${g.code}</td>
+      <td>${g.periode}</td>
+      <td class="grade-cell">${g.cijfer.toFixed(1)}</td>
+      <td><span class="status ${ok ? "voldoende" : "onvoldoende"}">${ok ? "Voldoende" : "Onvoldoende"}</span></td>
+    </tr>`;
+  }
+
+  function renderCijfers(filter){
+    const periodes = [...new Set(grades.map(g => g.periode))];
+    const select = document.getElementById("filterPeriode");
+    if (select.options.length === 1){
+      periodes.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p;
+        select.appendChild(opt);
+      });
+    }
+    const groups = filter === "alle" ? periodes : [filter];
+    document.getElementById("cijfersPerPeriode").innerHTML = groups.map(p => {
+      const rows = grades.filter(g => g.periode === p).map(rowHtml).join("");
+      return `<div class="periode-group">
+        <h3>${p}</h3>
+        <table>
+          <thead><tr><th>Vak</th><th>Code</th><th>Periode</th><th>Cijfer</th><th>Status</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+    }).join("");
+  }
+
+  const rooster = [
+    ["09:00", "Cloud Concepts\nD1.12", "", "Databases\nD2.04", "", "Projectgroep\nD1.02"],
+    ["11:00", "", "Netwerken\nB0.14", "", "Security Fund.\nB0.14", ""],
+    ["13:00", "Software Eng.\nC1.20", "", "", "Devops & Pipelines\nC1.20", ""],
+    ["15:00", "", "Projectgroep\nD1.02", "Projectmanagement\nD2.10", "", ""],
+  ];
+  function renderRooster(){
+    document.getElementById("roosterBody").innerHTML = rooster.map(row => {
+      const [tijd, ...dagen] = row;
+      const cells = dagen.map(d => d
+        ? `<td class="slot">${d.replace("\n","<br>")}</td>`
+        : `<td class="empty">—</td>`
+      ).join("");
+      return `<tr><th>${tijd}</th>${cells}</tr>`;
+    }).join("");
+  }
+
+  const berichten = [
+    { titel:"Cijfer gepubliceerd: Cloud Concepts", datum:"15 sep 2026", tekst:"Je cijfer voor Cloud Concepts (8.5) is zojuist gepubliceerd.", gelezen:false },
+    { titel:"Roosterwijziging week 39", datum:"14 sep 2026", tekst:"Het college Netwerken van dinsdag is verplaatst naar lokaal B0.14.", gelezen:false },
+    { titel:"Herinnering: inschrijven tentamen Databases", datum:"10 sep 2026", tekst:"Vergeet niet je in te schrijven voor het tentamen vóór vrijdag 17:00.", gelezen:true },
+  ];
+  function renderBerichten(){
+    document.getElementById("berichtenList").innerHTML = berichten.map(b => `
+      <div class="message ${b.gelezen ? "read" : "unread"}">
+        <div class="dot"></div>
+        <div class="message-body">
+          <div class="message-title">${b.titel}</div>
+          <div class="message-meta">${b.datum}</div>
+          <div class="message-text">${b.tekst}</div>
+        </div>
+      </div>`).join("");
+    document.getElementById("msgBadge").textContent = berichten.filter(b => !b.gelezen).length;
+  }
+
+  document.getElementById("filterPeriode").addEventListener("change", e => renderCijfers(e.target.value));
+
+  document.getElementById("nav").addEventListener("click", e => {
+    const btn = e.target.closest(".nav-item");
+    if (!btn) return;
+    document.querySelectorAll(".nav-item").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab = btn.dataset.tab;
+    document.querySelectorAll(".content").forEach(c => c.classList.add("hidden"));
+    document.getElementById("tab-" + tab).classList.remove("hidden");
+    document.getElementById("pageTitle").textContent = btn.childNodes[0].textContent.trim();
+  });
+
+  renderDashboard();
+  renderCijfers("alle");
+  renderRooster();
+  renderBerichten();
+</script>
+</body>
+</html>
